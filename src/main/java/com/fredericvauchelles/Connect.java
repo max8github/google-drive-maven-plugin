@@ -45,14 +45,12 @@ import java.util.Properties;
 
 public class Connect
 {
-    private static String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
-
-    public static Drive getDriveService(java.io.File googleClientProperties, Log logger)
+    public static Drive getDriveService(java.io.File googleClientProperties, MavenCredentialStore store)
         throws IOException, Exception  {
-        return getDriveService(googleClientProperties, logger, null);
+        return getDriveService(googleClientProperties, store, null);
     }
 
-    public static Drive getDriveService(java.io.File googleClientProperties, Log logger, String authToken)
+    public static Drive getDriveService(java.io.File googleClientProperties, MavenCredentialStore store, String authToken)
         throws IOException, Exception {
 
         Properties clientProperties = new Properties();
@@ -69,8 +67,6 @@ public class Connect
         if(clientSecret == null)
             throw new Exception("clientSecret is not defined in " + googleClientProperties.getAbsolutePath());
 
-        MavenCredentialStore store = new MavenCredentialStore(logger);
-        
         Credential credential = new GoogleCredential.Builder()
             .setTransport(httpTransport)
             .setJsonFactory(jsonFactory)

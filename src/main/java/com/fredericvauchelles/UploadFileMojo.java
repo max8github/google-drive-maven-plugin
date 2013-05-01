@@ -56,6 +56,11 @@ public class UploadFileMojo extends AbstractMojo
      */
     private java.io.File googleClientProperties;
 
+   /**
+     * @parameter expression="${basedir}/src/main/resources"
+     */
+    private java.io.File googleDrivePropertiesDirectory;
+
     /**
      * Location of the file.
      * @parameter 
@@ -79,7 +84,9 @@ public class UploadFileMojo extends AbstractMojo
         getLog().debug("Start Upload File Mojo");
 
         try{
-            Drive service = Connect.getDriveService(googleClientProperties, getLog());
+            MavenCredentialStore store = new MavenCredentialStore( googleDrivePropertiesDirectory, getLog() );
+
+            Drive service = Connect.getDriveService(googleClientProperties, store);
 
             FileSetManager fileSetManager = new FileSetManager(getLog());
             String[] includedFiles = fileSetManager.getIncludedFiles( fileset );

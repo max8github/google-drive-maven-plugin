@@ -56,6 +56,11 @@ public class ConnectMojo extends AbstractMojo
     public java.io.File googleClientProperties;
 
     /**
+     * @parameter expression="${basedir}/src/main/resources"
+     */
+    private java.io.File googleDrivePropertiesDirectory;
+
+    /**
      * @paramter expression="${googleDrive.authToken}"
      */
     public String authToken;
@@ -80,7 +85,7 @@ public class ConnectMojo extends AbstractMojo
             if(clientSecret == null)
                 throw new Exception("clientSecret is not defined in " + googleClientProperties.getAbsolutePath());
 
-            MavenCredentialStore store = new MavenCredentialStore(getLog());
+            MavenCredentialStore store = new MavenCredentialStore(googleDrivePropertiesDirectory, getLog());
 
             GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 httpTransport, jsonFactory, clientId, clientSecret, Arrays.asList(DriveScopes.DRIVE))
