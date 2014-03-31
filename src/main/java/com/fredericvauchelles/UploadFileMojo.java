@@ -16,6 +16,7 @@ package com.fredericvauchelles;
  * limitations under the License.
  */
 
+import com.google.api.services.drive.model.Permission;
 import org.apache.maven.plugin.*;
 import org.apache.maven.shared.model.fileset.util.*;
 import org.apache.maven.shared.model.fileset.FileSet;
@@ -77,6 +78,13 @@ public class UploadFileMojo extends AbstractMojo
     private String fileInfoPropertyPrefix;
 
 
+    /**
+     * If true files will be shared to anyone with link
+     * @parameter
+     */
+    private boolean share;
+
+
     public void execute() throws MojoExecutionException
     {
         getLog().debug("Start Upload File Mojo");
@@ -115,6 +123,14 @@ public class UploadFileMojo extends AbstractMojo
                     getLog().info("No parent");
 
                 getLog().info("File ID: " + file.getId());
+
+                if (share) {
+                    getLog().info("Sharing file");
+                    Permission anyonePermission = new Permission();
+                    anyonePermission.setRole("reader");
+                    anyonePermission.setType("anyone");
+                    service.permissions().insert(file.getId(), anyonePermission).execute();
+                }
 
                 if (fileInfoPropertyPrefix != null) {
                     if (includedFiles.length == 1) {
