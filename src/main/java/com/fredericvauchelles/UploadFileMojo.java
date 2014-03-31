@@ -20,28 +20,13 @@ import org.apache.maven.plugin.*;
 import org.apache.maven.shared.model.fileset.util.*;
 import org.apache.maven.shared.model.fileset.FileSet;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import org.apache.maven.project.MavenProject;
+
 import com.google.api.client.http.FileContent;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.services.drive.*;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.ParentReference;
 import com.google.api.services.drive.model.ChildReference;
 import com.google.api.services.drive.Drive.Files.Insert;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.FileOutputStream;
-import java.util.Arrays;
-import java.util.Properties;
 
 /**
  * Goal which touches a timestamp file.
@@ -78,6 +63,19 @@ public class UploadFileMojo extends AbstractMojo
      * @parameter
      */
     private String parentId;
+
+    /**
+     * @parameter default-value="${project}"
+     */
+    private MavenProject project;
+
+    /**
+     * fileInfoPropertyPrefix.fileId and fileInfoPropertyPrefix.webContentLink will be set if this property set. It is
+     * allowed to use this property when uploading single file.
+     * @parameter
+     */
+    private String fileInfoPropertyPrefix;
+
 
     public void execute() throws MojoExecutionException
     {
@@ -117,6 +115,17 @@ public class UploadFileMojo extends AbstractMojo
                     getLog().info("No parent");
 
                 getLog().info("File ID: " + file.getId());
+
+                if (fileInfoPropertyPrefix != null) {
+                    if (includedFiles.length == 1) {
+                        setProjectPropertyWithLogging("fileId", file.getId());
+                        setProjectPropertyWithLogging("webContentLink", file.getWebContentLink());
+                    } else {
+                        String message = "It is allowed to use fileInfoPropertyPrefix only with fileset containing one file";
+                        getLog().error(message);
+                        throw new Exception(message);
+                    }
+                }
             }
 
             getLog().info("Number of file sent : " + includedFiles.length);
@@ -126,4 +135,11 @@ public class UploadFileMojo extends AbstractMojo
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }
+
+    private void setProjectPropertyWithLogging(String key, String value) {
+        key = fileInfoPropertyPrefix + "." + key;
+        project.getProperties().setProperty(key, value);
+        getLog().info(String.format("Set property %s to '%s'", key, value));
+    }
+
 }
