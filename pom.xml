@@ -47,6 +47,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+        <groupId>com.google.http-client</groupId>
+        <artifactId>google-http-client-jackson</artifactId>
+        <version>1.20.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>file-management</artifactId>
       <version>1.2</version>
@@ -54,7 +59,7 @@
     <dependency>
       <groupId>com.google.apis</groupId>
       <artifactId>google-api-services-drive</artifactId>
-      <version>v2-rev5-1.7.2-beta</version>
+      <version>v2-rev180-1.20.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -62,12 +67,6 @@
       <version>2.2.1</version>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>googleapis</id>
-      <url>http://mavenrepo.google-api-java-client.googlecode.com/hg/</url>
-    </repository>
-  </repositories>
   <build>
     <plugins>
       <plugin>
